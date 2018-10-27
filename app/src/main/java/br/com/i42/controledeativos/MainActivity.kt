@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 val beaconName: String = if (bleDevice.mac == "0E:F3:EE:2A:0D:23") {
                     "Beacon"
                 } else {
-                    bleDevice.name
+                    "Dispositivo Não Cadastrado"
                 }
 
                 val beacon = BeaconData(
