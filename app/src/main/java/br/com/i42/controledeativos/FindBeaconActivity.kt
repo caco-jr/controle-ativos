@@ -53,7 +53,6 @@ class FindBeaconActivity : AppCompatActivity() {
     }
 
 
-
     private fun beaconItemClicked(beaconItem: BeaconData) {
         Toast.makeText(this, "Clicked: ${beaconItem.key}", Toast.LENGTH_LONG).show()
 
@@ -87,18 +86,23 @@ class FindBeaconActivity : AppCompatActivity() {
     }
 
     private fun getDistance(rssi: Int, txPower: Int): Double {
-        return Math.pow(10.0, (txPower.toDouble() - rssi) / (10 * 2))
+        val number: Double = Math.pow(10.0, (txPower.toDouble() - rssi) / (10 * 2))
+        val number3digits: Double = String.format("%.3f", number).toDouble()
+
+        val solution: Double = String.format("%.2f", number3digits).toDouble()
+
+        return solution
     }
 
     private fun handleFindBeacon() {
         var feedbackMessage: String
 
         fab.setOnClickListener { view ->
-            if ( isScanning ) {
-                feedbackMessage = "Cancelando procura"
+            if (isScanning) {
+                feedbackMessage = "Parando busca"
                 findBeaconCancel()
             } else {
-                feedbackMessage = "Procurando por Beacons"
+                feedbackMessage = "Buscando Beacons"
                 findBeacon()
             }
 
@@ -126,10 +130,10 @@ class FindBeaconActivity : AppCompatActivity() {
             override fun onScanStarted(success: Boolean) {
                 Log.d("B", "==> onScanStarted: $success")
 
+                beaconList.clear()
+
                 // Mudando o ícone do botão para pausar
                 fab.setImageResource(android.R.drawable.ic_media_pause)
-
-                beaconList.clear()
             }
 
             override fun onLeScan(bleDevice: BleDevice?) {
@@ -137,6 +141,7 @@ class FindBeaconActivity : AppCompatActivity() {
 
             override fun onScanning(bleDevice: BleDevice) {
                 val distance: Double = getDistance(bleDevice.rssi, -71)
+                val distanceText = "${ distance } metros"
 
                 val beaconName: String = if (bleDevice.mac == "0E:F3:EE:2A:0D:23") {
                     "Beacon"
@@ -147,12 +152,12 @@ class FindBeaconActivity : AppCompatActivity() {
                 val beacon = BeaconData(
                     bleDevice.mac,
                     bleDevice.key,
-                    distance.toString(),
+                    distanceText,
                     beaconName
                 )
 
                 Log.d("B", "==> onScanning: $bleDevice")
-                Log.d("B", "==> Distancia: ${distance} | Mac: " + bleDevice.mac + " | RSSI: " + bleDevice.rssi)
+                Log.d("B", "==> Distancia: $distance | Mac: " + bleDevice.mac + " | RSSI: " + bleDevice.rssi)
 
                 beaconList.add(beacon)
 
