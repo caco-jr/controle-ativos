@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToFindBeacon() {
+    private fun goToFindBeaconPage() {
         val intent = Intent(this, FindBeaconActivity::class.java)
 
         startNow.setOnClickListener{ view ->
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        goToFindBeacon()
+        goToFindBeaconPage()
     }
 
     override fun onRequestPermissionsResult(

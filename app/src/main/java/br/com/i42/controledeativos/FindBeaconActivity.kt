@@ -21,17 +21,14 @@ class FindBeaconActivity : AppCompatActivity() {
 
     var beaconList = ArrayList<BeaconData>()
 
+    var isScanning = false;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_beacon)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Procurando por Beacons", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-
-            findBeacon()
-        }
+        handleFindBeacon()
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = BeaconAdapter(beaconList) { beaconItem: BeaconData -> beaconItemClicked(beaconItem) }
@@ -93,7 +90,32 @@ class FindBeaconActivity : AppCompatActivity() {
         return Math.pow(10.0, (txPower.toDouble() - rssi) / (10 * 2))
     }
 
+    private fun handleFindBeacon() {
+        var feedbackMessage: String
+
+        fab.setOnClickListener { view ->
+            if ( isScanning ) {
+                feedbackMessage = "Cancelando procura"
+                findBeaconCancel()
+            } else {
+                feedbackMessage = "Procurando por Beacons"
+                findBeacon()
+            }
+
+            Snackbar.make(view, feedbackMessage, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+        }
+    }
+
+    private fun findBeaconCancel() {
+        isScanning = false
+
+        BleManager.getInstance().cancelScan()
+    }
+
     private fun findBeacon() {
+        isScanning = true
+
         val scanRuleConfig = BleScanRuleConfig.Builder()
             .setScanTimeOut(10000)
             .build()
@@ -103,6 +125,11 @@ class FindBeaconActivity : AppCompatActivity() {
         BleManager.getInstance().scan(object : BleScanCallback() {
             override fun onScanStarted(success: Boolean) {
                 Log.d("B", "==> onScanStarted: $success")
+
+                // Mudando o ícone do botão para pausar
+                fab.setImageResource(android.R.drawable.ic_media_pause)
+
+                beaconList.clear()
             }
 
             override fun onLeScan(bleDevice: BleDevice?) {
@@ -135,6 +162,8 @@ class FindBeaconActivity : AppCompatActivity() {
 
             override fun onScanFinished(scanResultList: List<BleDevice>) {
                 Log.d("B", "==> onScanFinished: $scanResultList")
+
+                fab.setImageResource(android.R.drawable.ic_media_play)
             }
         })
     }
