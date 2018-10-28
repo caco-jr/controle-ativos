@@ -30,7 +30,7 @@ class BeaconAdapter(private val beaconItemList: List<BeaconData>, private val cl
     class BeaconViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(beacon: BeaconData, clickListener: (BeaconData) -> Unit) {
             itemView.beacon_item_name.text = beacon.name
-            itemView.beacon_id.text = beacon.key
+            itemView.beacon_item_category.text = beacon.category
             itemView.beacon_distance.text = beacon.distance
 
             itemView.setOnClickListener { clickListener(beacon) }

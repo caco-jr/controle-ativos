@@ -1,8 +1,10 @@
 package br.com.i42.controledeativos
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -13,6 +15,8 @@ import com.clj.fastble.callback.BleScanCallback
 import com.clj.fastble.data.BleDevice
 import com.clj.fastble.scan.BleScanRuleConfig
 import kotlinx.android.synthetic.main.activity_find_beacon.*
+
+
 
 class FindBeaconActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -45,6 +49,19 @@ class FindBeaconActivity : AppCompatActivity() {
             adapter = viewAdapter
         }
 
+        if (BleManager.getInstance().isBlueEnable) {
+            initBle()
+
+        } else {
+            val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(intent, 0x01)
+
+            initBle()
+        }
+
+    }
+
+    private fun initBle() {
         BleManager.getInstance().init(application)
         BleManager.getInstance()
             .enableLog(true)
@@ -52,37 +69,14 @@ class FindBeaconActivity : AppCompatActivity() {
             .operateTimeout = 5000
     }
 
-
     private fun beaconItemClicked(beaconItem: BeaconData) {
         Toast.makeText(this, "Clicked: ${beaconItem.key}", Toast.LENGTH_LONG).show()
 
         // Launch second activity, pass part ID as string parameter
         val showDetailActivityIntent = Intent(this, BeaconDetailActivity::class.java)
 
-        showDetailActivityIntent.putExtra(Intent.EXTRA_TEXT, beaconItem.key)
+        showDetailActivityIntent.putExtra(Intent.EXTRA_TEXT, beaconItem.mac)
         startActivity(showDetailActivityIntent)
-
-//        BleManager.getInstance().connect(beaconItem.beacon, object : BleGattCallback() {
-//            override fun onConnectFail(bleDevice: BleDevice?, exception: BleException?) {
-//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//            }
-//
-//            override fun onStartConnect() {
-//                Log.d("s", "==> Iniciando a conexão")
-//            }
-//
-//            override fun onConnectSuccess(bleDevice: BleDevice, gatt: BluetoothGatt, status: Int) {
-//                Log.d("beacon", "===> CONECTADO: ${bleDevice.device} | ${bleDevice.timestampNanos} | ${status}")
-//            }
-//
-//            override fun onDisConnected(
-//                isActiveDisConnected: Boolean,
-//                bleDevice: BleDevice,
-//                gatt: BluetoothGatt,
-//                status: Int
-//            ) {
-//            }
-//        })
     }
 
     private fun getDistance(rssi: Int, txPower: Int): Double {
@@ -132,8 +126,9 @@ class FindBeaconActivity : AppCompatActivity() {
 
                 beaconList.clear()
 
-                // Mudando o ícone do botão para pausar
+                // Mudando o botão para pausar
                 fab.setImageResource(android.R.drawable.ic_media_pause)
+                fab.supportBackgroundTintList = ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_stop)
             }
 
             override fun onLeScan(bleDevice: BleDevice?) {
@@ -141,19 +136,25 @@ class FindBeaconActivity : AppCompatActivity() {
 
             override fun onScanning(bleDevice: BleDevice) {
                 val distance: Double = getDistance(bleDevice.rssi, -71)
-                val distanceText = "${ distance } metros"
+                val distanceText = "${distance} metros"
 
-                val beaconName: String = if (bleDevice.mac == "0E:F3:EE:2A:0D:23") {
-                    "Beacon"
+                val beaconName: String
+                val beaconCategory: String
+
+                if (bleDevice.mac == "0E:F3:EE:2A:0D:23") {
+                    beaconName = "Eniac"
+                    beaconCategory = "Tecnologia"
                 } else {
-                    "Dispositivo Não Cadastrado"
+                    beaconName = "Dispositivo Não Cadastrado"
+                    beaconCategory = ""
                 }
 
                 val beacon = BeaconData(
                     bleDevice.mac,
                     bleDevice.key,
                     distanceText,
-                    beaconName
+                    beaconName,
+                    beaconCategory
                 )
 
                 Log.d("B", "==> onScanning: $bleDevice")
@@ -169,6 +170,8 @@ class FindBeaconActivity : AppCompatActivity() {
                 Log.d("B", "==> onScanFinished: $scanResultList")
 
                 fab.setImageResource(android.R.drawable.ic_media_play)
+                fab.supportBackgroundTintList = ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_play)
+                isScanning = false
             }
         })
     }
