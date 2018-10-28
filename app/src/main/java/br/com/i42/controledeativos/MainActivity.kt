@@ -7,42 +7,15 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.widget.Button
-import android.widget.Toast
-import com.clj.fastble.BleManager
-import com.clj.fastble.callback.BleScanCallback
-import com.clj.fastble.data.BleDevice
-import com.clj.fastble.scan.BleScanRuleConfig
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var viewAdapter: RecyclerView.Adapter<*>
-    private lateinit var viewManager: RecyclerView.LayoutManager
-
     private val PERMISSION_REQUEST_COARSE_LOCATION = 1
-    var beaconList = ArrayList<BeaconData>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        viewManager = LinearLayoutManager(this)
-        viewAdapter = BeaconAdapter(beaconList) { beaconItem: BeaconData -> beaconItemClicked(beaconItem) }
-
-        recyclerView = findViewById<RecyclerView>(R.id.rv_beacons).apply {
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
-            setHasFixedSize(true)
-
-            // use a linear layout manager
-            layoutManager = viewManager
-
-            // specify an viewAdapter (see also next example)
-            adapter = viewAdapter
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Android M Permission check 
@@ -60,101 +33,21 @@ class MainActivity : AppCompatActivity() {
                 builder.show()
             }
         }
+    }
 
-        BleManager.getInstance().init(application)
-        BleManager.getInstance()
-            .enableLog(true)
-            .setReConnectCount(1, 5000)
-            .operateTimeout = 5000
+    private fun goToFindBeacon() {
+        val intent = Intent(this, FindBeaconActivity::class.java)
 
-        val buttonFindBeacon: Button = findViewById<Button>(R.id.beaconScanner)
-        buttonFindBeacon.setOnClickListener {
-            findBeacon()
+        startNow.setOnClickListener{ view ->
+            startActivity(intent)
         }
     }
 
-    private fun beaconItemClicked(beaconItem: BeaconData) {
-        Toast.makeText(this, "Clicked: ${beaconItem.key}", Toast.LENGTH_LONG).show()
+    override fun onResume() {
+        super.onResume()
 
-        // Launch second activity, pass part ID as string parameter
-        val showDetailActivityIntent = Intent(this, BeaconDetailActivity::class.java)
-
-        showDetailActivityIntent.putExtra(Intent.EXTRA_TEXT, beaconItem.key)
-        startActivity(showDetailActivityIntent)
-
-//        BleManager.getInstance().connect(beaconItem.beacon, object : BleGattCallback() {
-//            override fun onConnectFail(bleDevice: BleDevice?, exception: BleException?) {
-//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//            }
-//
-//            override fun onStartConnect() {
-//                Log.d("s", "==> Iniciando a conexão")
-//            }
-//
-//            override fun onConnectSuccess(bleDevice: BleDevice, gatt: BluetoothGatt, status: Int) {
-//                Log.d("beacon", "===> CONECTADO: ${bleDevice.device} | ${bleDevice.timestampNanos} | ${status}")
-//            }
-//
-//            override fun onDisConnected(
-//                isActiveDisConnected: Boolean,
-//                bleDevice: BleDevice,
-//                gatt: BluetoothGatt,
-//                status: Int
-//            ) {
-//            }
-//        })
+        goToFindBeacon()
     }
-
-    private fun getDistance(rssi: Int, txPower: Int): Double {
-        return Math.pow(10.0, (txPower.toDouble() - rssi) / (10 * 2))
-    }
-
-    private fun findBeacon() {
-        val scanRuleConfig = BleScanRuleConfig.Builder()
-            .setScanTimeOut(10000)
-            .build()
-
-        BleManager.getInstance().initScanRule(scanRuleConfig)
-
-        BleManager.getInstance().scan(object : BleScanCallback() {
-            override fun onScanStarted(success: Boolean) {
-                Log.d("B", "==> onScanStarted: $success")
-            }
-
-            override fun onLeScan(bleDevice: BleDevice?) {
-            }
-
-            override fun onScanning(bleDevice: BleDevice) {
-                val distance: Double = getDistance(bleDevice.rssi, -71)
-
-                val beaconName: String = if (bleDevice.mac == "0E:F3:EE:2A:0D:23") {
-                    "Beacon"
-                } else {
-                    "Dispositivo Não Cadastrado"
-                }
-
-                val beacon = BeaconData(
-                    bleDevice.mac,
-                    bleDevice.key,
-                    distance.toString(),
-                    beaconName
-                )
-
-                Log.d("B", "==> onScanning: $bleDevice")
-                Log.d("B", "==> Distancia: ${distance} | Mac: " + bleDevice.mac + " | RSSI: " + bleDevice.rssi)
-
-                beaconList.add(beacon)
-
-                // Atualizando Listagem de Beacon
-                viewAdapter.notifyDataSetChanged()
-            }
-
-            override fun onScanFinished(scanResultList: List<BleDevice>) {
-                Log.d("B", "==> onScanFinished: $scanResultList")
-            }
-        })
-    }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
