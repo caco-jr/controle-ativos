@@ -17,7 +17,6 @@ import com.clj.fastble.scan.BleScanRuleConfig
 import kotlinx.android.synthetic.main.activity_find_beacon.*
 
 
-
 class FindBeaconActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
@@ -31,8 +30,6 @@ class FindBeaconActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_beacon)
         setSupportActionBar(toolbar)
-
-        handleFindBeacon()
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = BeaconAdapter(beaconList) { beaconItem: BeaconData -> beaconItemClicked(beaconItem) }
@@ -59,6 +56,15 @@ class FindBeaconActivity : AppCompatActivity() {
             initBle()
         }
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        handleFindBeacon()
+    }
+
+    private fun handleActionBar() {
     }
 
     private fun initBle() {
@@ -90,6 +96,11 @@ class FindBeaconActivity : AppCompatActivity() {
 
     private fun handleFindBeacon() {
         var feedbackMessage: String
+
+        // Quando abre a página, e a lista está vazia ele já começa a buscar
+        if ( beaconList.size == 0 ) {
+            findBeacon()
+        }
 
         fab.setOnClickListener { view ->
             if (isScanning) {
@@ -127,8 +138,9 @@ class FindBeaconActivity : AppCompatActivity() {
                 beaconList.clear()
 
                 // Mudando o botão para pausar
-                fab.setImageResource(android.R.drawable.ic_media_pause)
-                fab.supportBackgroundTintList = ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_stop)
+                fab.setImageResource(R.drawable.ic_stop_white_24dp)
+                fab.supportBackgroundTintList =
+                        ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_stop)
             }
 
             override fun onLeScan(bleDevice: BleDevice?) {
@@ -145,7 +157,7 @@ class FindBeaconActivity : AppCompatActivity() {
                     beaconName = "Eniac"
                     beaconCategory = "Tecnologia"
                 } else {
-                    beaconName = "Dispositivo Não Cadastrado"
+                    beaconName = "Desconhecido"
                     beaconCategory = ""
                 }
 
@@ -170,7 +182,8 @@ class FindBeaconActivity : AppCompatActivity() {
                 Log.d("B", "==> onScanFinished: $scanResultList")
 
                 fab.setImageResource(android.R.drawable.ic_media_play)
-                fab.supportBackgroundTintList = ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_play)
+                fab.supportBackgroundTintList =
+                        ContextCompat.getColorStateList(this@FindBeaconActivity, R.color.button_search_play)
                 isScanning = false
             }
         })

@@ -7,27 +7,43 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity" android:orientation="vertical">
 
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:src="@drawable/background_person"
+            android:scaleType="fitStart"
+            android:layout_marginBottom="46dp"
+    />
+
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bem vindo(a)"
-            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textSize="30sp"
             android:layout_gravity="center"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Agilize seu trabalho encontrando os itens"
-            android:textSize="20sp"
-            android:layout_gravity="center"/>
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="50dp"/>
 
     <Button
             android:id="@+id/startNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Começar Agora"
-            android:textAllCaps="false"
-            android:layout_gravity="center"/>
+            android:background="@drawable/rounded_button"
+            android:textColor="#ffffff"
+            android:layout_gravity="center"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+
+    />
 
 </LinearLayout>
