@@ -9,7 +9,7 @@
 
     <ImageView
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="270dp"
             android:src="@drawable/background_person"
             android:scaleType="fitStart"
             android:layout_marginBottom="46dp"

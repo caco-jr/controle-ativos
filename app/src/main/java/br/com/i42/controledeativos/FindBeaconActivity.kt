@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.widget.Toast
 import com.clj.fastble.BleManager
 import com.clj.fastble.callback.BleScanCallback
 import com.clj.fastble.data.BleDevice
@@ -64,9 +63,6 @@ class FindBeaconActivity : AppCompatActivity() {
         handleFindBeacon()
     }
 
-    private fun handleActionBar() {
-    }
-
     private fun initBle() {
         BleManager.getInstance().init(application)
         BleManager.getInstance()
@@ -76,8 +72,6 @@ class FindBeaconActivity : AppCompatActivity() {
     }
 
     private fun beaconItemClicked(beaconItem: BeaconData) {
-        Toast.makeText(this, "Clicked: ${beaconItem.key}", Toast.LENGTH_LONG).show()
-
         // Launch second activity, pass part ID as string parameter
         val showDetailActivityIntent = Intent(this, BeaconDetailActivity::class.java)
 
