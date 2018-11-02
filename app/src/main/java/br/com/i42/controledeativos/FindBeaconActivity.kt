@@ -81,10 +81,9 @@ class FindBeaconActivity : AppCompatActivity() {
 
     private fun getDistance(rssi: Int, txPower: Int): Double {
         val number: Double = Math.pow(10.0, (txPower.toDouble() - rssi) / (10 * 2))
-        val number3digits: Double = String.format("%.3f", number).toDouble()
 
-        val solution: Double = String.format("%.2f", number3digits).toDouble()
-
+//        val solution: Double = String.format("%.2f", number).toDouble()
+        val solution: Double = Math.round(number * 100.0) / 100.0
         return solution
     }
 
@@ -142,7 +141,7 @@ class FindBeaconActivity : AppCompatActivity() {
 
             override fun onScanning(bleDevice: BleDevice) {
                 val distance: Double = getDistance(bleDevice.rssi, -71)
-                val distanceText = "${distance} metros"
+                val distanceText = "$distance metros"
 
                 val beaconName: String
                 val beaconCategory: String

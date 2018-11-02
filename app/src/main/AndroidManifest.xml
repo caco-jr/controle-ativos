@@ -13,7 +13,8 @@
             tools:ignore="GoogleAppIndexingWarning">
         <activity
                 android:name=".MainActivity"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:theme="@style/AppTheme.NoActionBar"
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -23,13 +24,15 @@
 
         <activity
                 android:name=".BeaconDetailActivity"
-                android:parentActivityName=".FindBeaconActivity">
+                android:parentActivityName=".FindBeaconActivity"
+                android:screenOrientation="portrait">
         </activity>
 
         <activity
                 android:name=".FindBeaconActivity"
                 android:label="@string/title_activity_find_beacon"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:theme="@style/AppTheme.NoActionBar"
+                android:screenOrientation="portrait">
         </activity>
     </application>
 

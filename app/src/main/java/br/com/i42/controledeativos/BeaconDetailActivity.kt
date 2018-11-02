@@ -11,6 +11,7 @@ import com.clj.fastble.callback.BleGattCallback
 import com.clj.fastble.data.BleDevice
 import com.clj.fastble.exception.BleException
 import kotlinx.android.synthetic.main.activity_beacon_detail.*
+import kotlinx.android.synthetic.main.content_detail_page.*
 
 class BeaconDetailActivity : AppCompatActivity() {
 
@@ -44,12 +45,25 @@ class BeaconDetailActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun handlePageContent(beaconMac: String) {
         if (beaconMac == "0E:F3:EE:2A:0D:23") {
-            beacon_item_id.text =
-                    "O vendedor Eniac está vendendo na plataforma desde 2010, " +
-                    "conta com mais de 2.000 produtos alocados em nosso galpão de fullfilment. E a categoria desse beacon para a loja é Tecnologia." +
-                    "O responsável por esse setor é: Almeida."
+            val wizardView = layoutInflater.inflate(R.layout.content_detail_page, dynamic_detail, false)
+
+            dynamic_detail.addView(wizardView)
+
+            detail_image.setImageResource(R.drawable.estoque)
+
+            detail_customer.text = "Eniac"
+            detail_category.text = "Tecnologia"
+            detail_stock.text = "+200 produtos"
+
+
+            detail_text.text = "O vendedor  está vendendo na plataforma desde 2010, " +
+                    "conta com mais de 2.000 produtos alocados em nosso galpão de fullfilment." +
+                    "\nO responsável por esse setor é: Almeida."
+
         } else {
-            beacon_item_id.text = "Dispositivo ainda não cadastrado."
+            val wizardView = layoutInflater.inflate(R.layout.empty_detail_page, dynamic_detail, false)
+
+            dynamic_detail.addView(wizardView)
         }
     }
 
